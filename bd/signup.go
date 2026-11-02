@@ -10,17 +10,18 @@ import (
 
 func SignUp(sig models.SignUp) error {
 	fmt.Println("Comienza Registro")
-	
+
 	err := DbConnect()
 	if err != nil {
 		return err
 	}
 	defer Db.Close()
 
-	sentencia := "INSERT INTO users (User_Email, User_UUID, User_DateAdd) VALUES ('"+sig.UserEmail+"','"+sig.UserUUID+"','"+tools.FechaMySQL()+"')"
-	fmt.Println(sentencia)
+	// Idempotente: Cognito puede reintentar la invocación, y un reintento
+	// con el mismo usuario no debe fallar (requiere que User_UUID sea único).
+	sentencia := "INSERT INTO users (User_Email, User_UUID, User_DateAdd) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE User_UUID = User_UUID"
 
-	_, err = Db.Exec(sentencia)
+	_, err = Db.Exec(sentencia, sig.UserEmail, sig.UserUUID, tools.FechaMySQL())
 	if err != nil {
 		fmt.Println(err.Error())
 		return err

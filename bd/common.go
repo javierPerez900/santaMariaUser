@@ -5,32 +5,39 @@ import (
 	"fmt"
 	"os"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/javier/santaMariaUser/models"
 	"github.com/javier/santaMariaUser/secretm"
 )
 
 var SecretModel models.SecretRDSJson
-var err error
 var Db *sql.DB
 
 func ReadSecret() error{
-	SecretModel, err = secretm.GetSecret(os.Getenv("SecretName"))
-	return err
+	secret, err := secretm.GetSecret(os.Getenv("SecretName"))
+	if err != nil {
+		return err
+	}
+
+	SecretModel = secret
+	return nil
 }
 
 func DbConnect() error {
-	Db, err = sql.Open("mysql", ConnStr(SecretModel))
+	db, err := sql.Open("mysql", ConnStr(SecretModel))
 	if err != nil {
-		fmt.Println( err.Error())
+		fmt.Println(err.Error())
 		return err
 	}
 
-	err = Db.Ping()
+	err = db.Ping()
 	if err != nil {
-		fmt.Println( err.Error())
+		fmt.Println(err.Error())
+		db.Close()
 		return err
 	}
 
+	Db = db
 	fmt.Println("Conexión exitosa de la BD")
 	return nil
 }
@@ -41,7 +48,6 @@ func ConnStr(claves models.SecretRDSJson) string {
 	authToken = claves.Password
 	dbEndPoint = claves.Host
 	dbName = "santa_maria"
-	dsn := fmt.Sprintf("%s:%s@tcp(%s)/%s?allowCleartextPasswords=true", dbUser, authToken, dbEndPoint, dbName)
-	fmt.Println(dsn)
-	return dsn
+
+	return fmt.Sprintf("%s:%s@tcp(%s)/%s?allowCleartextPasswords=true", dbUser, authToken, dbEndPoint, dbName)
 }

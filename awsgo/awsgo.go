@@ -2,6 +2,7 @@ package awsgo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
@@ -9,14 +10,15 @@ import (
 
 var Ctx context.Context
 var Cfg aws.Config
-var err error
 
-func InicializoAWS() {
+func InicializoAWS() error {
 	Ctx = context.TODO()
-	Cfg, err = config.LoadDefaultConfig(Ctx, config.WithDefaultRegion("us-east-1"))
+
+	cfg, err := config.LoadDefaultConfig(Ctx, config.WithDefaultRegion("us-east-1"))
 	if err != nil {
-		panic("Error al cargar configurations .aws/config " + err.Error())
+		return fmt.Errorf("error al cargar la configuración de AWS: %w", err)
 	}
 
-	
+	Cfg = cfg
+	return nil
 }
