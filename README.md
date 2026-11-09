@@ -1,8 +1,8 @@
 # Registro de usuarios con Cognito
 
-Lambda en Go que se ejecuta como **trigger Post Confirmation de Amazon Cognito**: cuando una persona confirma su cuenta con el código del correo, esta función guarda su correo y su identificador en la tabla `users` de Aurora MySQL. Así, la API puede relacionar sus direcciones y pedidos con ese usuario.
+Lambda en Go que se ejecuta como **trigger Post Confirmation de Amazon Cognito**: cuando una persona confirma su cuenta con el código del correo, esta función guarda su correo y su identificador en la tabla `users` de Amazon RDS para MySQL. Así, la API puede relacionar sus direcciones y pedidos con ese usuario.
 
-  > El proyecto completo se compone de tres repositorios:
+> El proyecto completo se compone de tres repositorios:
 
 | Repositorio | Contenido |
 |---|---|
